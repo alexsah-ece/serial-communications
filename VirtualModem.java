@@ -5,10 +5,10 @@ import java.util.Arrays;
 
 class VirtualModem{
 
-	static final String ECHO_REQUEST_CODE = "E0634\r";
-	static final String IMAGE_REQEST_CODE = "M5841\r";
+	static final String ECHO_REQUEST_CODE = "E9112\r";
+	static final String IMAGE_REQEST_CODE = "M0422\r";
 	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
-	static final String IMAGE_REQEST_CODE_ERRORS = "G3338\r";
+	static final String IMAGE_REQEST_CODE_ERRORS = "G3694\r";
 	static final String GPS_REQUEST_CODE_PACKETS = "P8863R=1045040\r";
 	static final String GPS_REQUEST_CODE = "P8863";
 	static final String ACK = "Q1412\r";
@@ -21,9 +21,9 @@ class VirtualModem{
 	public VirtualModem(){
 
 		modem = new Modem();
-		modem.setSpeed(80000);
-		modem.setTimeout(5000);
-		duration = 5 * 1000;
+		modem.setSpeed(16000);
+		modem.setTimeout(3000);
+		duration = 2 * 60 * 1000;
 
 		int k;
 
@@ -55,10 +55,14 @@ class VirtualModem{
 		System.out.println("Receiving packets...\n");
 
 		BufferedWriter txt = new BufferedWriter(new FileWriter("../Data/text_echoPackets.txt"));
-		BufferedWriter log = new BufferedWriter(new FileWriter("../Data/log_echoPackets.txt"));
+		BufferedWriter log = new BufferedWriter(new FileWriter("../Data/log_echoPackets.csv"));
+
+        log.write("Packet,Response time,Time elapsed");
+        log.newLine();
 
 		String packet = "";
 		long st, start = System.currentTimeMillis();
+        int count = 0;
 
 		l1:
 		while (System.currentTimeMillis()-start < duration){
@@ -72,16 +76,16 @@ class VirtualModem{
 				if (k == -1) break l1;
 				packet += (char)k;
 			}
+            count += 1;
 
 			txt.write(packet);
 			txt.newLine();
 			packet = "";
 
-			log.write("Response time:\t");
-			log.write(String.valueOf((System.currentTimeMillis()-st)));
-			log.write("\tTime elapsed: ");
-			log.write(String.valueOf((System.currentTimeMillis()-start)));
-			log.newLine();		
+			log.write(String.valueOf(count) + ",");
+            log.write(String.valueOf((System.currentTimeMillis()-st)) + ",");
+            log.write(String.valueOf((System.currentTimeMillis()-start)));
+            log.newLine();      		
 		}
 
 		txt.flush();
@@ -97,13 +101,13 @@ class VirtualModem{
 
 		System.out.println("Receiving image...\n");
 
-		//OutputStream image = new FileOutputStream("../Pictures/image_fix.jpeg");
-		OutputStream image = new FileOutputStream("../Pictures/image_error.jpeg");
+		OutputStream image = new FileOutputStream("../Pictures/image_fix.jpeg");
+		//OutputStream image = new FileOutputStream("../Pictures/image_error.jpeg");
 		
 		int prev, cur;
 
-		//modem.write(IMAGE_REQEST_CODE.getBytes());
-		modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
+		modem.write(IMAGE_REQEST_CODE.getBytes());
+		//modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
 
 		prev = modem.read();
 		cur = modem.read();
@@ -166,13 +170,13 @@ class VirtualModem{
 		for(int i=0; i < 4; i++){
 
 			String[] temp = packets[i*10].split(",");
-            //Longtitude calculation
+            
 			int longtitude = Integer.parseInt(temp[4].split("\\.")[0]);
             int longtitude_secs = (int)(0.006 * Integer.parseInt(temp[4].split("\\.")[1]));
-            //Latitude calculation
+            
 			int latitude = Integer.parseInt(temp[2].split("\\.")[0]);
             int latitude_secs = (int)(0.006* Integer.parseInt(temp[2].split("\\.")[1]));
-            //Append to the code
+            
             String coordinates = String.valueOf(longtitude) + String.valueOf(longtitude_secs)
                                 + String.valueOf(latitude) + String.valueOf(latitude_secs);
 			T += "T=" + coordinates;
@@ -207,9 +211,12 @@ class VirtualModem{
 		System.out.println("Receiving ARQPackets...\n");
 
 		BufferedWriter txt = new BufferedWriter(new FileWriter("../Data/text_ARQPackets.txt"));
-		BufferedWriter log = new BufferedWriter(new FileWriter("../Data/log_ARQPackets.txt"));
+		BufferedWriter log = new BufferedWriter(new FileWriter("../Data/log_ARQPackets.csv"));
 
-		int reqs;
+        log.write("Packet,Response time,Times requested,Time elapsed");
+        log.newLine();
+
+		int reqs, count = 0;
 		boolean isCorrect;
 		long st = 0, start = System.currentTimeMillis();
 		byte[] packet = new byte[58];
@@ -243,15 +250,16 @@ class VirtualModem{
 
 				isCorrect = check(packet);
 			}
+            count += 1;
 
 			System.out.format("reqs = %d%n", reqs);
 
-			txt.write(new String(packet) + " Times requested: " + reqs);
+			txt.write(new String(packet));
 			txt.newLine();
 
-			log.write("Response time:\t");
-			log.write(String.valueOf((System.currentTimeMillis()-st)));
-			log.write("\tTime elapsed: ");
+            log.write(String.valueOf(count) + ",");
+			log.write(String.valueOf((System.currentTimeMillis()-st)) + ",");
+            log.write(String.valueOf(reqs) + ",");
 			log.write(String.valueOf((System.currentTimeMillis()-start)));
 			log.newLine();		
 		}
@@ -288,10 +296,10 @@ class VirtualModem{
 
 		VirtualModem m = new VirtualModem();
 			
-		//m.echoPackets();
+		m.echoPackets();
 		//m.imagePackets();
 		//m.gpsPackets();
-		m.ARQPackets();
+		//m.ARQPackets();
 		m.closeConnection();
 	}
 }
