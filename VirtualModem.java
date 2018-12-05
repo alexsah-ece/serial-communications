@@ -9,7 +9,7 @@ class VirtualModem{
 	static final String IMAGE_REQEST_CODE = "M6133\r";
 	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
 	static final String IMAGE_REQEST_CODE_ERRORS = "G0764\r";
-	static final String GPS_REQUEST_CODE_PACKETS = "P3847R=1077750\r";
+	static final String GPS_REQUEST_CODE_PACKETS = "P3847R=1016850\r";
 	static final String GPS_REQUEST_CODE = "P3847";
 	static final String ACK = "Q5950\r";
 	static final String NACK = "R2301\r";
@@ -23,7 +23,7 @@ class VirtualModem{
 		modem = new Modem();
 		modem.setSpeed(16000);
 		modem.setTimeout(3000);
-		duration = 5 * 1000;
+		duration = 5 * 60 * 1000;
 
 		int k;
 
@@ -97,17 +97,15 @@ class VirtualModem{
 		System.out.println("echoPackets END\n");
 	}
 
-	public void imagePackets() throws IOException{
+	public void imagePackets(String code, String filename) throws IOException{
 
 		System.out.println("Receiving image...\n");
 
-		OutputStream image = new FileOutputStream("../Pictures/E1.jpeg");
-		//OutputStream image = new FileOutputStream("../Pictures/E2.jpeg");
+		OutputStream image = new FileOutputStream("../Pictures/"+filename+".jpeg");
 		
 		int prev, cur;
 
-		modem.write(IMAGE_REQEST_CODE.getBytes());
-		//modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
+		modem.write(code.getBytes());
 
 		prev = modem.read();
 		cur = modem.read();
@@ -160,17 +158,17 @@ class VirtualModem{
 		temp_w.flush();
 		temp_w.close();
 
-		String[] packets = new String[40];
+		String[] packets = new String[60];
 		temp_r.readLine();
-		for(int i=0; i < 40; i++) packets[i] = temp_r.readLine();
+		for(int i=0; i < 60; i++) packets[i] = temp_r.readLine();
 		temp_r.close();
 
 		//Pick four and combine them with the req_code to form the gps-image code
 		String T = GPS_REQUEST_CODE;
-		for(int i=0; i < 6; i++){
+		for(int i=0; i < 5; i++){
 
 			String[] temp = packets[i*10].split(",");
-            
+            System.out.println(Arrays.toString(temp));
 			int longtitude = Integer.parseInt(temp[4].split("\\.")[0]);
             int longtitude_secs = (int)(0.006 * Integer.parseInt(temp[4].split("\\.")[1]));
             
@@ -291,11 +289,17 @@ class VirtualModem{
 	public static void main(String[] args) throws Exception{
 
 		VirtualModem m = new VirtualModem();
-			
-		//m.echoPackets();
-		//m.ARQPackets();
-		//m.imagePackets();
-		m.gpsPackets();
+
+		m.echoPackets();
+		m.ARQPackets();
+		/*
+		m.imagePackets(IMAGE_REQEST_CODE, "E1");
 		m.closeConnection();
+		m = new VirtualModem();
+		m.imagePackets(IMAGE_REQEST_CODE_ERRORS, "E2");
+		m.closeConnection();
+		m = new VirtualModem();
+		m.gpsPackets();
+		*/
 	}
 }
