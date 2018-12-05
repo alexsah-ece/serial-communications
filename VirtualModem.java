@@ -5,14 +5,14 @@ import java.util.Arrays;
 
 class VirtualModem{
 
-	static final String ECHO_REQUEST_CODE = "E6385\r";
-	static final String IMAGE_REQEST_CODE = "M5550\r";
+	static final String ECHO_REQUEST_CODE = "E1663\r";
+	static final String IMAGE_REQEST_CODE = "M6133\r";
 	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
-	static final String IMAGE_REQEST_CODE_ERRORS = "G8167\r";
-	static final String GPS_REQUEST_CODE_PACKETS = "P3157R=1087740\r";
-	static final String GPS_REQUEST_CODE = "P3157";
-	static final String ACK = "Q5059\r";
-	static final String NACK = "R3674\r";
+	static final String IMAGE_REQEST_CODE_ERRORS = "G0764\r";
+	static final String GPS_REQUEST_CODE_PACKETS = "P3847R=1077750\r";
+	static final String GPS_REQUEST_CODE = "P3847";
+	static final String ACK = "Q5950\r";
+	static final String NACK = "R2301\r";
 
 
 	private Modem modem;
@@ -23,7 +23,7 @@ class VirtualModem{
 		modem = new Modem();
 		modem.setSpeed(16000);
 		modem.setTimeout(3000);
-		duration = 4 * 60 * 1000;
+		duration = 5 * 1000;
 
 		int k;
 
@@ -101,13 +101,13 @@ class VirtualModem{
 
 		System.out.println("Receiving image...\n");
 
-		//OutputStream image = new FileOutputStream("../Pictures/image.jpeg");
-		OutputStream image = new FileOutputStream("../Pictures/image_error.jpeg");
+		OutputStream image = new FileOutputStream("../Pictures/E1.jpeg");
+		//OutputStream image = new FileOutputStream("../Pictures/E2.jpeg");
 		
 		int prev, cur;
 
-		//modem.write(IMAGE_REQEST_CODE.getBytes());
-		modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
+		modem.write(IMAGE_REQEST_CODE.getBytes());
+		//modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
 
 		prev = modem.read();
 		cur = modem.read();
@@ -167,7 +167,7 @@ class VirtualModem{
 
 		//Pick four and combine them with the req_code to form the gps-image code
 		String T = GPS_REQUEST_CODE;
-		for(int i=0; i < 4; i++){
+		for(int i=0; i < 6; i++){
 
 			String[] temp = packets[i*10].split(",");
             
@@ -183,7 +183,7 @@ class VirtualModem{
 		}
         T += "\r";
 
-		OutputStream gps = new FileOutputStream("../Pictures/gps.jpeg");
+		OutputStream gps = new FileOutputStream("../Pictures/M1.jpeg");
 
 		int k;
 		modem.write(T.getBytes());
@@ -294,8 +294,8 @@ class VirtualModem{
 			
 		//m.echoPackets();
 		//m.ARQPackets();
-		m.imagePackets();
-		//m.gpsPackets();
+		//m.imagePackets();
+		m.gpsPackets();
 		m.closeConnection();
 	}
 }
