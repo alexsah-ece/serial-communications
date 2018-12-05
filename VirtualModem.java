@@ -292,7 +292,6 @@ class VirtualModem{
 
 		m.echoPackets();
 		m.ARQPackets();
-		/*
 		m.imagePackets(IMAGE_REQEST_CODE, "E1");
 		m.closeConnection();
 		m = new VirtualModem();
@@ -300,6 +299,5 @@ class VirtualModem{
 		m.closeConnection();
 		m = new VirtualModem();
 		m.gpsPackets();
-		*/
 	}
 }
