@@ -9,7 +9,7 @@ class VirtualModem{
 	static final String IMAGE_REQEST_CODE = "M2133\r";
 	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
 	static final String IMAGE_REQEST_CODE_ERRORS = "G7862\r";
-	static final String GPS_REQUEST_CODE_PACKETS = "P9905R=1046350\r";
+	static final String GPS_REQUEST_CODE_PACKETS = "P9905R=1045040\r";
 	static final String GPS_REQUEST_CODE = "P9905";
 	static final String ACK = "Q0299\r";
 	static final String NACK = "R4507\r";
@@ -151,6 +151,7 @@ class VirtualModem{
 		while (true){
 
 			int k = modem.read();
+			System.out.print(k);
 			if(k == -1) break;
 			temp_w.write((char)k);
 		}
@@ -166,7 +167,7 @@ class VirtualModem{
 		//Pick four and combine them with the req_code to form the gps-image code
 		String T = GPS_REQUEST_CODE;
 		for(int i=0; i < 5; i++){
-
+			System.out.println(Arrays.toString(packets));
 			String[] temp = packets[i*10].split(",");
             System.out.println(Arrays.toString(temp));
 			int longtitude = Integer.parseInt(temp[4].split("\\.")[0]);
@@ -290,14 +291,9 @@ class VirtualModem{
 
 		VirtualModem m = new VirtualModem();
 
-		m.echoPackets();
-		m.ARQPackets();
-		m.imagePackets(IMAGE_REQEST_CODE, "E1");
-		m.closeConnection();
-		m = new VirtualModem();
-		m.imagePackets(IMAGE_REQEST_CODE_ERRORS, "E2");
-		m.closeConnection();
+		
 		m = new VirtualModem();
 		m.gpsPackets();
+		m.closeConnection();
 	}
 }
