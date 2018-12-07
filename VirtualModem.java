@@ -5,14 +5,14 @@ import java.util.Arrays;
 
 class VirtualModem{
 
-	static final String ECHO_REQUEST_CODE = "E1663\r";
-	static final String IMAGE_REQEST_CODE = "M6133\r";
+	static final String ECHO_REQUEST_CODE = "E2951\r";
+	static final String IMAGE_REQEST_CODE = "M2133\r";
 	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
-	static final String IMAGE_REQEST_CODE_ERRORS = "G0764\r";
-	static final String GPS_REQUEST_CODE_PACKETS = "P3847R=1016850\r";
-	static final String GPS_REQUEST_CODE = "P3847";
-	static final String ACK = "Q5950\r";
-	static final String NACK = "R2301\r";
+	static final String IMAGE_REQEST_CODE_ERRORS = "G7862\r";
+	static final String GPS_REQUEST_CODE_PACKETS = "P9905R=1046350\r";
+	static final String GPS_REQUEST_CODE = "P9905";
+	static final String ACK = "Q0299\r";
+	static final String NACK = "R4507\r";
 
 
 	private Modem modem;
