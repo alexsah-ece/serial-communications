@@ -97,17 +97,16 @@ class VirtualModem{
 		System.out.println("echoPackets END\n");
 	}
 
-	public void imagePackets() throws IOException{
+	public void imagePackets(String code, String filename) throws IOException{
 
 		System.out.println("Receiving image...\n");
 
-		OutputStream image = new FileOutputStream("../Pictures/E1.jpeg");
+		OutputStream image = new FileOutputStream("../Pictures/"+filename+".jpeg");
 		//OutputStream image = new FileOutputStream("../Pictures/E2.jpeg");
 		
 		int prev, cur;
 
-		modem.write(IMAGE_REQEST_CODE.getBytes());
-		//modem.write(IMAGE_REQEST_CODE_ERRORS.getBytes());
+		modem.write(code.getBytes());
 
 		prev = modem.read();
 		cur = modem.read();
@@ -292,10 +291,14 @@ class VirtualModem{
 
 		VirtualModem m = new VirtualModem();
 			
-		//m.echoPackets();
-		//m.ARQPackets();
-		//m.imagePackets();
-		m.gpsPackets();
+		m.echoPackets();
+		m.ARQPackets();
+		m.imagePackets(IMAGE_REQEST_CODE, "E1");
 		m.closeConnection();
+		m = new VirtualModem();
+		m.imagePackets(IMAGE_REQEST_CODE_ERRORS, "E2");
+		m.closeConnection();
+		m = new VirtualModem();
+		m.gpsPackets();
 	}
 }
