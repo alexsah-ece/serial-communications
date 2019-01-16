@@ -5,14 +5,14 @@ import java.util.Arrays;
 
 class VirtualModem{
 
-	static final String ECHO_REQUEST_CODE = "E1663\r";
-	static final String IMAGE_REQEST_CODE = "M6133\r";
-	//static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
-	static final String IMAGE_REQEST_CODE_ERRORS = "G0764\r";
-	static final String GPS_REQUEST_CODE_PACKETS = "P3847R=1077750\r";
-	static final String GPS_REQUEST_CODE = "P3847";
-	static final String ACK = "Q5950\r";
-	static final String NACK = "R2301\r";
+   static final String ECHO_REQUEST_CODE = "E6385\r";
+   static final String IMAGE_REQEST_CODE = "M5550\r";
+   //static final String IMAGE_REQEST_CODE = "M5841CAM=PTZ3\r";
+   static final String IMAGE_REQEST_CODE_ERRORS = "G8167\r";
+   static final String GPS_REQUEST_CODE_PACKETS = "P3157R=1087740\r";
+   static final String GPS_REQUEST_CODE = "P3157";
+   static final String ACK = "Q5059\r";
+   static final String NACK = "R3674\r";
 
 
 	private Modem modem;
@@ -23,7 +23,7 @@ class VirtualModem{
 		modem = new Modem();
 		modem.setSpeed(16000);
 		modem.setTimeout(3000);
-		duration = 5 * 1000;
+		duration = 5 * 60 * 1000;
 
 		int k;
 
@@ -102,7 +102,6 @@ class VirtualModem{
 		System.out.println("Receiving image...\n");
 
 		OutputStream image = new FileOutputStream("../Pictures/"+filename+".jpeg");
-		//OutputStream image = new FileOutputStream("../Pictures/E2.jpeg");
 		
 		int prev, cur;
 
@@ -152,6 +151,7 @@ class VirtualModem{
 		while (true){
 
 			int k = modem.read();
+			System.out.print(k);
 			if(k == -1) break;
 			temp_w.write((char)k);
 		}
@@ -159,17 +159,17 @@ class VirtualModem{
 		temp_w.flush();
 		temp_w.close();
 
-		String[] packets = new String[40];
+		String[] packets = new String[60];
 		temp_r.readLine();
-		for(int i=0; i < 40; i++) packets[i] = temp_r.readLine();
+		for(int i=0; i < 60; i++) packets[i] = temp_r.readLine();
 		temp_r.close();
 
 		//Pick four and combine them with the req_code to form the gps-image code
 		String T = GPS_REQUEST_CODE;
-		for(int i=0; i < 6; i++){
-
+		for(int i=0; i < 4; i++){
+			System.out.println(Arrays.toString(packets));
 			String[] temp = packets[i*10].split(",");
-            
+            System.out.println(Arrays.toString(temp));
 			int longtitude = Integer.parseInt(temp[4].split("\\.")[0]);
             int longtitude_secs = (int)(0.006 * Integer.parseInt(temp[4].split("\\.")[1]));
             
@@ -290,7 +290,7 @@ class VirtualModem{
 	public static void main(String[] args) throws Exception{
 
 		VirtualModem m = new VirtualModem();
-			
+
 		m.echoPackets();
 		m.ARQPackets();
 		m.imagePackets(IMAGE_REQEST_CODE, "E1");
